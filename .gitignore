@@ -1,0 +1,36 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Virtual environments
+.venv/
+.env/
+venv/
+
+# Notebooks and analysis
+.ipynb_checkpoints/
+
+# Logs and reports
+artifacts/
+logs/
+
+# Data outputs
+data/raw/
+data/processed/
+data/output/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Tooling
+.pytest_cache/
+coverage.xml
+htmlcov/
+.mypy_cache/
+.idea/
+.vscode/
+

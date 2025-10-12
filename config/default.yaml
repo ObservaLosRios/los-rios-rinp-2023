@@ -1,0 +1,14 @@
+encoding: latin-1
+separator: ";"
+null_tokens:
+  - ""
+  - NA
+  - "N/A"
+  - nan
+  - "s.i."
+paths:
+  raw_data: data/raw/rinp_generacion_2023_cl.csv
+  processed_data: data/processed/rinp_generacion_2023_cl_clean.parquet
+  aggregates: data/processed/region_summary.csv
+  quality_report: logs/quality_metrics.json
+  logs_dir: logs
