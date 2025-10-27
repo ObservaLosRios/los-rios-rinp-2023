@@ -1,13 +1,174 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Dashboard Residuos Peligrosos 2023</title>
-    <link rel="stylesheet" href="custom-styles.css" />
-  </head>
-  <body>
-    <h1>Indicadores Residuos Peligrosos</h1>
-    <section id="summary"></section>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Residuos declarados en Los Ríos · RNP 2023</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header Principal -->
+    <header class="main-header">
+        <div class="logos-container">
+            <img src="thumbnail_Logo observa.png" alt="Universidad Austral de Chile - Centro de Estudios Regionales" class="header-logo-left">
+            <img src="thumbnail_images.png" alt="Logo Región" class="header-logo">
+        </div>
+        <div class="header-content">
+            <h1 class="main-title" id="main-title">Residuos declarados en Los Ríos · RNP 2023</h1>
+            <p class="subtitle" id="subtitle">Universidad Austral de Chile - Centro de Estudios Regionales</p>
+        </div>
+    </header>
+    
+    <!-- Navegación -->
+    <nav class="nav-container">
+        <div class="nav-links" id="nav-links">
+            <span class="nav-link active" data-section="toneladas">Toneladas declaradas</span>
+            <span class="nav-link" data-section="regiones-foco">Regiones foco</span>
+            <span class="nav-link" data-section="tratamientos">Tratamientos</span>
+            <span class="nav-link" data-section="generadores">Top generadores</span>
+            <span class="nav-link" data-section="rubros">Principales rubros</span>
+        </div>
+    </nav>
+    
+    <!-- Container Principal -->
+    <div class="container">
+        <section id="toneladas" class="section active">
+            <h2 class="section-title">Toneladas declaradas por región</h2>
+            <div class="chart-section">
+                <div
+                    id="chart-toneladas"
+                    class="chart-frame plotly-chart"
+                    role="img"
+                    aria-label="Gráfico de toneladas declaradas por región"
+                ></div>
+            </div>
+        </section>
+
+        <section id="regiones-foco" class="section">
+            <h2 class="section-title">Regiones foco: toneladas declaradas</h2>
+            <p class="chart-description">
+                Comparación de las regiones priorizadas, destacando el liderazgo de Los Ríos dentro del grupo foco.
+            </p>
+            <div class="chart-section">
+                <div
+                    id="chart-regiones-foco"
+                    class="chart-frame plotly-chart"
+                    role="img"
+                    aria-label="Gráfico de barras de regiones foco con toneladas declaradas"
+                ></div>
+            </div>
+        </section>
+
+        <section id="tratamientos" class="section">
+            <h2 class="section-title">Tratamientos en regiones foco</h2>
+            <p class="chart-description">
+                Distribución porcentual de los principales tratamientos aplicados en cada región foco.
+            </p>
+            <div class="chart-section">
+                <div
+                    id="chart-tratamientos"
+                    class="chart-frame plotly-chart"
+                    role="img"
+                    aria-label="Gráfico de participación de tratamientos en regiones foco"
+                ></div>
+            </div>
+        </section>
+
+        <section id="generadores" class="section">
+            <h2 class="section-title">Top generadores en Los Ríos</h2>
+            <p class="chart-description">
+                Establecimientos con mayor volumen declarado de residuos en la región.
+            </p>
+            <div class="chart-section">
+                <div
+                    id="chart-generadores"
+                    class="chart-frame plotly-chart"
+                    role="img"
+                    aria-label="Gráfico de los principales generadores en Los Ríos"
+                ></div>
+            </div>
+        </section>
+
+        <section id="rubros" class="section">
+            <h2 class="section-title">Principales rubros en Los Ríos por volumen generado</h2>
+            <p class="chart-description">
+                Sectores económicos que concentran la mayor generación de residuos declarados.
+            </p>
+            <div class="chart-section">
+                <div
+                    id="chart-rubros"
+                    class="chart-frame plotly-chart"
+                    role="img"
+                    aria-label="Gráfico de los principales rubros en Los Ríos por volumen generado"
+                ></div>
+            </div>
+        </section>
+
+        <!-- Secciones dinámicas se generarán aquí -->
+        <div id="dynamic-sections"></div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <p class="footer-text" id="footer-text">
+            Desarrollado con Plantilla de Visualización<br>
+            Universidad Austral de Chile - Centro de Estudios Regionales
+        </p>
+        <img src="thumbnail_logo cer.png" alt="Universidad Austral de Chile - Centro de Estudios Regionales" class="footer-logo">
+    </footer>
+
+    <!-- Botón flotante de configuración -->
+    <button class="floating-btn" onclick="openModal()">⚙️</button>
+
+    <!-- Modal de configuración -->
+    <div id="configModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 style="color: #1B4F72; margin-bottom: 20px;">Configuración de la Plantilla</h2>
+            
+            <div class="config-section">
+                <h3>Información General</h3>
+                <label for="title-input">Título Principal:</label>
+                <input type="text" id="title-input" placeholder="Ej: Análisis de Ventas 2024">
+                
+                <label for="subtitle-input">Subtítulo:</label>
+                <input type="text" id="subtitle-input" placeholder="Ej: Reporte Trimestral de Resultados">
+                
+                <label for="footer-input">Texto del Footer:</label>
+                <textarea id="footer-input" placeholder="Ej: Análisis desarrollado por...&#10;Empresa - Departamento"></textarea>
+            </div>
+            
+            <div class="config-section">
+                <h3>Datos JSON</h3>
+                <label for="data-input">Datos (formato JSON):</label>
+                <textarea id="data-input" placeholder='Ejemplo:
+{
+  "charts": {
+    "ventas": {
+      "title": "Ventas por Mes",
+      "type": "bar",
+      "data": [{"mes": "Enero", "valor": 1000}, {"mes": "Febrero", "valor": 1200}]
+    },
+    "usuarios": {
+      "title": "Usuarios Activos",
+      "type": "line", 
+      "data": [{"fecha": "2024-01", "cantidad": 500}, {"fecha": "2024-02", "cantidad": 650}]
+    }
+  }
+}'></textarea>
+            </div>
+            
+            <div id="status-message"></div>
+            
+            <button class="btn" onclick="applyConfiguration()">Aplicar Configuración</button>
+            <button class="btn" onclick="loadExampleData()" style="background: #6c757d; margin-left: 10px;">Cargar Datos de Ejemplo</button>
+        </div>
+    </div>
+
+    <!-- Tooltip global -->
+    <div class="tooltip" id="tooltip"></div>
+
+    <script src="https://cdn.plot.ly/plotly-3.1.1.min.js"></script>
     <script src="interactive.js"></script>
-  </body>
+</body>
 </html>
