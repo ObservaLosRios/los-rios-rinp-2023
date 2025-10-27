@@ -100,9 +100,3 @@ los-rios-rinp-2023/
 - `pytest` ejecuta la suite completa (`tests/test_pipeline.py`, `tests/test_transform.py`).
 - `pytest -k transform` permite filtrar escenarios específicos.
 - Los logs enriquecidos (`src/utils/logging.py`) escriben a consola y a disco para trazabilidad.
-
-## Próximos pasos sugeridos
-
-- Incorporar históricos de años previos reutilizando la misma arquitectura ETL.
-- Automatizar la publicación de `docs/` vía GitHub Pages o CI/CD.
-- Añadir alertas automáticas basadas en los indicadores de `logs/quality_metrics.json`.
