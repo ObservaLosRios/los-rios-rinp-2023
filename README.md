@@ -1,4 +1,3 @@
-git clone https://github.com/ObservaLosRios/los-rios-rinp-2023.git
 # RNP 2023 · Residuos Peligrosos Los Ríos
 
 Repositorio para la ingesta, transformación y análisis de los residuos peligrosos declarados en el Registro Nacional de Emisiones y Transferencias (RNP) 2023, con foco en la región de Los Ríos. El proyecto combina un pipeline ETL reproducible, validaciones automatizadas y visualizaciones interactivas orientadas a la toma de decisiones territoriales.
