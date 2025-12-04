@@ -1069,7 +1069,7 @@ const CHART_DEFINITIONS = {
             "size": 14
           },
           "showarrow": false,
-          "text": "Chile, RNP 2023",
+          "text": "Chile, RETC 2023",
           "x": 0,
           "xref": "paper",
           "y": 1.06,
@@ -1082,7 +1082,7 @@ const CHART_DEFINITIONS = {
             "size": 11
           },
           "showarrow": false,
-          "text": "Fuente: Registro Nacional de Emisiones y Transferencias de Residuos (RNP) 2023",
+          "text": "Fuente: Registro de Emisiones y Transferencias de Contaminantes (RETC) 2023",
           "x": 0,
           "xref": "paper",
           "y": -0.22,
@@ -1281,8 +1281,8 @@ const CHART_DEFINITIONS = {
           "x0": -0.07,
           "x1": 0.95,
           "xref": "paper",
-          "y0": 1.11,
-          "y1": 1.11,
+          "y0": 1.13,
+          "y1": 1.13,
           "yref": "paper"
         }
       ],
@@ -1294,7 +1294,7 @@ const CHART_DEFINITIONS = {
             "size": 14
           },
           "showarrow": false,
-          "text": "Chile, RNP 2023",
+          "text": "Chile, RETC 2023",
           "x": 0,
           "xref": "paper",
           "y": 1.05,
@@ -1320,7 +1320,7 @@ const CHART_DEFINITIONS = {
             "size": 11
           },
           "showarrow": false,
-          "text": "Fuente: Registro Nacional de Emisiones y Transferencias de Residuos (RNP) 2023",
+          "text": "Fuente: Registro de Emisiones y Transferencias de Contaminantes (RETC) 2023",
           "x": 0,
           "xref": "paper",
           "y": -0.28,
@@ -3671,7 +3671,7 @@ const CHART_DEFINITIONS = {
             "size": 14
           },
           "showarrow": false,
-          "text": "Los Ríos, RNP 2023",
+          "text": "Los Ríos, RETC 2023",
           "x": 0,
           "xref": "paper",
           "y": 1.06,
@@ -3684,7 +3684,7 @@ const CHART_DEFINITIONS = {
             "size": 11
           },
           "showarrow": false,
-          "text": "Fuente: Registro Nacional de Emisiones y Transferencias de Residuos (RNP) 2023",
+          "text": "Fuente: Registro de Emisiones y Transferencias de Contaminantes (RETC) 2023",
           "x": 0,
           "xref": "paper",
           "y": -0.22,
@@ -3694,6 +3694,369 @@ const CHART_DEFINITIONS = {
     }
   }
 };
+
+let dataTableModalNode = null;
+let dataTableWrapperNode = null;
+let dataTableTitleNode = null;
+
+function ensureDataTableNodes() {
+  if (!dataTableModalNode) {
+    dataTableModalNode = document.getElementById("data-table-modal");
+  }
+  if (!dataTableWrapperNode) {
+    dataTableWrapperNode = document.getElementById("data-table-wrapper");
+  }
+  if (!dataTableTitleNode) {
+    dataTableTitleNode = document.getElementById("data-table-title");
+  }
+}
+
+function requestChartFullscreen(chartId) {
+  const container = document.getElementById(chartId);
+  if (!container) {
+    return;
+  }
+
+  const request =
+    container.requestFullscreen ||
+    container.webkitRequestFullscreen ||
+    container.msRequestFullscreen;
+
+  if (request) {
+    request.call(container);
+  }
+}
+
+function downloadPlotlyImage(chartId, format) {
+  const container = document.getElementById(chartId);
+  if (!container || typeof Plotly === "undefined") {
+    return;
+  }
+
+  Plotly.downloadImage(container, {
+    format,
+    filename: `${chartId}-${format}`,
+  }).catch((error) => {
+    console.error(`No se pudo descargar ${chartId} (${format})`, error);
+  });
+}
+
+function printChart(chartId) {
+  const container = document.getElementById(chartId);
+  if (!container || typeof Plotly === "undefined") {
+    return;
+  }
+
+  Plotly.toImage(container, { format: "png", width: 1200, height: 900 })
+    .then((dataUrl) => {
+      const printWindow = window.open("", "_blank");
+      if (!printWindow) {
+        return;
+      }
+      printWindow.document.write(
+        `<img src="${dataUrl}" style="width: 100%; height: auto;" alt="${chartId}" />`,
+      );
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    })
+    .catch((error) => {
+      console.error("No se pudo preparar la impresión", error);
+    });
+}
+
+function arrayValueAt(source, index) {
+  if (Array.isArray(source)) {
+    return typeof source[index] === "undefined" || source[index] === null
+      ? ""
+      : source[index];
+  }
+  return typeof source === "undefined" || source === null ? "" : source;
+}
+
+function formatCustomData(value) {
+  if (value === "" || value === undefined || value === null) {
+    return "";
+  }
+  if (typeof value === "object") {
+    try {
+      return JSON.stringify(value);
+    } catch (error) {
+      console.warn("No se pudo serializar customdata", error);
+      return String(value);
+    }
+  }
+  return value;
+}
+
+function formatCellValue(value) {
+  if (value === undefined || value === null) {
+    return "";
+  }
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return String(value);
+  }
+  return String(value);
+}
+
+function escapeHTML(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function escapeForCSV(value) {
+  const stringValue = formatCellValue(value);
+  if (/[",\n]/.test(stringValue)) {
+    return `"${stringValue.replace(/"/g, '""')}"`;
+  }
+  return stringValue;
+}
+
+function buildDatasetFromChart(chartId) {
+  const figure = CHART_DEFINITIONS[chartId];
+  if (!figure) {
+    return null;
+  }
+
+  const headers = ["serie", "x", "y", "texto", "customdata"];
+  const rows = [];
+
+  (figure.data || []).forEach((trace, traceIndex) => {
+    if (trace.mode === "lines" && trace.hoverinfo === "skip") {
+      return;
+    }
+
+    const len = Math.max(
+      Array.isArray(trace.x) ? trace.x.length : 0,
+      Array.isArray(trace.y) ? trace.y.length : 0,
+      Array.isArray(trace.text) ? trace.text.length : 0,
+      Array.isArray(trace.customdata) ? trace.customdata.length : 0,
+      0,
+    );
+
+    if (len === 0) {
+      return;
+    }
+
+    for (let index = 0; index < len; index += 1) {
+      rows.push({
+        serie: trace.name || trace.legendgroup || `Serie ${traceIndex + 1}`,
+        x: arrayValueAt(trace.x, index),
+        y: arrayValueAt(trace.y, index),
+        texto: arrayValueAt(trace.text, index),
+        customdata: formatCustomData(arrayValueAt(trace.customdata, index)),
+      });
+    }
+  });
+
+  return {
+    title: figure.layout?.title?.text || "Visualización",
+    headers,
+    rows,
+  };
+}
+
+function convertDatasetToCSV(headers, rows) {
+  const headerLine = headers.join(",");
+  const dataLines = rows.map((row) =>
+    headers.map((header) => escapeForCSV(row[header])).join(","),
+  );
+  return [headerLine, ...dataLines].join("\n");
+}
+
+function convertDatasetToHTMLTable(headers, rows) {
+  const headerCells = headers
+    .map((header) => `<th scope="col">${escapeHTML(header)}</th>`)
+    .join("");
+  const bodyRows = rows
+    .map((row) =>
+      `<tr>${headers
+        .map((header) => `<td>${escapeHTML(formatCellValue(row[header]))}</td>`)
+        .join("")}</tr>`,
+    )
+    .join("");
+  return `<table class="data-table"><thead><tr>${headerCells}</tr></thead><tbody>${bodyRows}</tbody></table>`;
+}
+
+function convertDatasetToHTMLDocument(headers, rows) {
+  const tableMarkup = convertDatasetToHTMLTable(headers, rows);
+  return `<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"></head><body>${tableMarkup}</body></html>`;
+}
+
+function triggerFileDownload(content, filename, mimeType) {
+  const blob =
+    content instanceof Blob ? content : new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+function downloadDataset(chartId, format) {
+  const dataset = buildDatasetFromChart(chartId);
+  if (!dataset || dataset.rows.length === 0) {
+    alert("No se encontraron datos para exportar todavía.");
+    return;
+  }
+
+  if (format === "csv") {
+    const csv = convertDatasetToCSV(dataset.headers, dataset.rows);
+    triggerFileDownload(csv, `${chartId}.csv`, "text/csv;charset=utf-8;");
+  } else if (format === "xls") {
+    const htmlDoc = convertDatasetToHTMLDocument(dataset.headers, dataset.rows);
+    triggerFileDownload(htmlDoc, `${chartId}.xls`, "application/vnd.ms-excel");
+  }
+}
+
+function openDataTableModal(chartId) {
+  const dataset = buildDatasetFromChart(chartId);
+  if (!dataset || dataset.rows.length === 0) {
+    alert("No se encontraron datos para esta visualización.");
+    return;
+  }
+
+  ensureDataTableNodes();
+  if (!dataTableModalNode || !dataTableWrapperNode) {
+    return;
+  }
+
+  if (dataTableTitleNode) {
+    dataTableTitleNode.textContent = `Datos · ${dataset.title}`;
+  }
+  dataTableWrapperNode.innerHTML = convertDatasetToHTMLTable(
+    dataset.headers,
+    dataset.rows,
+  );
+  dataTableModalNode.classList.add("open");
+  dataTableModalNode.setAttribute("aria-hidden", "false");
+}
+
+function closeDataTableModal() {
+  ensureDataTableNodes();
+  if (!dataTableModalNode) {
+    return;
+  }
+  dataTableModalNode.classList.remove("open");
+  dataTableModalNode.setAttribute("aria-hidden", "true");
+  if (dataTableWrapperNode) {
+    dataTableWrapperNode.innerHTML = "";
+  }
+}
+
+function initDataTableModal() {
+  ensureDataTableNodes();
+  const closeButton = document.querySelector(".close-data-table");
+  if (closeButton) {
+    closeButton.addEventListener("click", closeDataTableModal);
+  }
+  if (dataTableModalNode) {
+    dataTableModalNode.addEventListener("click", (event) => {
+      if (event.target === dataTableModalNode) {
+        closeDataTableModal();
+      }
+    });
+  }
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      closeDataTableModal();
+      closeAllDownloadMenus();
+    }
+  });
+}
+
+const DOWNLOAD_MENU_OPTIONS = [
+  { label: "View in full screen", onSelect: requestChartFullscreen },
+  { label: "Print chart", onSelect: printChart },
+  {
+    label: "Download PNG image",
+    onSelect: (chartId) => downloadPlotlyImage(chartId, "png"),
+  },
+  {
+    label: "Download JPEG image",
+    onSelect: (chartId) => downloadPlotlyImage(chartId, "jpeg"),
+  },
+  {
+    label: "Download SVG vector image",
+    onSelect: (chartId) => downloadPlotlyImage(chartId, "svg"),
+  },
+  { label: "Download CSV", onSelect: (chartId) => downloadDataset(chartId, "csv") },
+  { label: "Download XLS", onSelect: (chartId) => downloadDataset(chartId, "xls") },
+  { label: "View data table", onSelect: openDataTableModal },
+];
+
+function closeAllDownloadMenus() {
+  document.querySelectorAll(".download-menu").forEach((menu) => {
+    menu.classList.remove("open");
+  });
+  document.querySelectorAll(".download-toggle").forEach((toggle) => {
+    toggle.setAttribute("aria-expanded", "false");
+  });
+}
+
+function initDownloadPanels() {
+  const panels = document.querySelectorAll(".download-panel[data-chart-id]");
+  if (!panels.length) {
+    return;
+  }
+
+  panels.forEach((panel) => {
+    const chartId = panel.dataset.chartId;
+    panel.innerHTML = "";
+
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "download-toggle";
+    toggle.setAttribute("aria-haspopup", "true");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-controls", `${chartId}-download-menu`);
+    toggle.innerHTML = '<span class="download-icon" aria-hidden="true">☰</span><span class="sr-only">Opciones de descarga</span>';
+
+    const menu = document.createElement("div");
+    menu.className = "download-menu";
+    menu.id = `${chartId}-download-menu`;
+    menu.setAttribute("role", "menu");
+
+    DOWNLOAD_MENU_OPTIONS.forEach((option) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "download-option";
+      button.textContent = option.label;
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        option.onSelect(chartId);
+        closeAllDownloadMenus();
+      });
+      menu.appendChild(button);
+    });
+
+    toggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      const isOpen = menu.classList.contains("open");
+      closeAllDownloadMenus();
+      if (!isOpen) {
+        menu.classList.add("open");
+        toggle.setAttribute("aria-expanded", "true");
+      }
+    });
+
+    panel.appendChild(toggle);
+    panel.appendChild(menu);
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!event.target.closest(".download-panel")) {
+      closeAllDownloadMenus();
+    }
+  });
+}
 
 const sanitiseLayout = (layout = {}) => {
   const nextLayout = { ...layout };
@@ -3813,6 +4176,9 @@ document.addEventListener('DOMContentLoaded', () => {
       closeModal();
     }
   });
+
+  initDownloadPanels();
+  initDataTableModal();
 
   const initialSection = document.querySelector('.section.active');
   renderChartsInSection(initialSection);
