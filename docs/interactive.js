@@ -3692,6 +3692,167 @@ const CHART_DEFINITIONS = {
         }
       ]
     }
+  },
+  "chart-serie-temporal": {
+    "data": [
+      {
+        "x": [
+          2016,
+          2017,
+          2018,
+          2019,
+          2020,
+          2021,
+          2022,
+          2023
+        ],
+        "y": [
+          55.371,
+          47.735,
+          34.838,
+          99.861,
+          76.574,
+          73.433,
+          68.571,
+          64.307
+        ],
+        "mode": "lines+markers",
+        "name": "Toneladas valorizadas",
+        "line": {
+          "color": "#1B4F72",
+          "width": 3
+        },
+        "marker": {
+          "color": "#1B4F72",
+          "size": 9
+        },
+        "hovertemplate": "<b>%{x}</b><br>Toneladas valorizadas: %{y:,.3f}<extra></extra>",
+        "type": "scatter"
+      }
+    ],
+    "layout": {
+      "font": {
+        "family": "Georgia, serif",
+        "color": "#1e1b18",
+        "size": 15
+      },
+      "title": {
+        "font": {
+          "size": 24,
+          "color": "#1e1b18"
+        },
+        "text": "Serie temporal de valorización de residuos en Los Ríos",
+        "x": 0.05,
+        "y": 0.94
+      },
+      "xaxis": {
+        "title": {
+          "font": {
+            "family": "Georgia, serif",
+            "color": "#1e1b18",
+            "size": 14
+          },
+          "text": "Año"
+        },
+        "tickfont": {
+          "family": "Georgia, serif",
+          "color": "#1e1b18",
+          "size": 12
+        },
+        "tickmode": "array",
+        "tickvals": [
+          2016,
+          2017,
+          2018,
+          2019,
+          2020,
+          2021,
+          2022,
+          2023
+        ],
+        "ticktext": [
+          "2016",
+          "2017",
+          "2018",
+          "2019",
+          "2020",
+          "2021",
+          "2022",
+          "2023"
+        ],
+        "showgrid": true,
+        "gridcolor": "#d9d3c5",
+        "griddash": "dot",
+        "zeroline": false,
+        "linecolor": "#d9d3c5"
+      },
+      "yaxis": {
+        "title": {
+          "font": {
+            "family": "Georgia, serif",
+            "color": "#1e1b18",
+            "size": 14
+          },
+          "text": "Toneladas valorizadas"
+        },
+        "tickfont": {
+          "family": "Georgia, serif",
+          "color": "#1e1b18",
+          "size": 12
+        },
+        "showgrid": true,
+        "gridcolor": "#d9d3c5",
+        "griddash": "dot",
+        "zeroline": false,
+        "linecolor": "#d9d3c5",
+        "rangemode": "tozero"
+      },
+      "hoverlabel": {
+        "font": {
+          "family": "Georgia, serif",
+          "color": "#1e1b18"
+        },
+        "bgcolor": "#ffffff"
+      },
+      "margin": {
+        "l": 90,
+        "r": 80,
+        "t": 135,
+        "b": 120
+      },
+      "plot_bgcolor": "#f7f2ea",
+      "paper_bgcolor": "#f7f2ea",
+      "shapes": [
+        {
+          "line": {
+            "color": "#d62828",
+            "width": 4
+          },
+          "type": "line",
+          "x0": -0.03,
+          "x1": 0.78,
+          "xref": "paper",
+          "y0": 1.12,
+          "y1": 1.12,
+          "yref": "paper"
+        }
+      ],
+      "annotations": [
+        {
+          "font": {
+            "color": "#6e6252",
+            "family": "Georgia, serif",
+            "size": 11
+          },
+          "showarrow": false,
+          "text": "Fuente: Registro de Emisiones y Transferencias de Contaminantes (RETC) 2023",
+          "x": 0,
+          "xref": "paper",
+          "y": -0.22,
+          "yref": "paper"
+        }
+      ]
+    }
   }
 };
 

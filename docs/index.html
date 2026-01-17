@@ -23,6 +23,7 @@
     <nav class="nav-container">
         <div class="nav-links" id="nav-links">
             <span class="nav-link active" data-section="toneladas">Toneladas declaradas</span>
+            <span class="nav-link" data-section="serie-temporal">Serie temporal</span>
             <span class="nav-link" data-section="regiones-foco">Regiones foco</span>
             <span class="nav-link" data-section="tratamientos">Tratamientos</span>
             <span class="nav-link" data-section="rubros">Principales rubros</span>
@@ -34,6 +35,9 @@
     <div class="container">
         <section id="toneladas" class="section active">
             <h2 class="section-title">Toneladas de residuos declaradas por región</h2>
+            <p class="chart-description">
+                Comparación del total de residuos declarados por región en 2023.
+            </p>
             <div class="chart-section">
                 <div class="download-panel" data-chart-id="chart-toneladas"></div>
                 <div
@@ -41,6 +45,22 @@
                     class="chart-frame plotly-chart"
                     role="img"
                     aria-label="Gráfico de toneladas declaradas por región"
+                ></div>
+            </div>
+        </section>
+
+        <section id="serie-temporal" class="section">
+            <h2 class="section-title">Serie temporal de valorización de residuos en Los Ríos</h2>
+            <p class="chart-description">
+                Evolución anual de las toneladas valorizadas en la región.
+            </p>
+            <div class="chart-section">
+                <div class="download-panel" data-chart-id="chart-serie-temporal"></div>
+                <div
+                    id="chart-serie-temporal"
+                    class="chart-frame plotly-chart"
+                    role="img"
+                    aria-label="Serie temporal de valorización de residuos en Los Ríos"
                 ></div>
             </div>
         </section>
